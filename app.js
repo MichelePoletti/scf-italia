@@ -10,10 +10,13 @@
     return r;
   });
 
+  /* Etichette puramente descrittive: il dato disponibile e' il numero di consulenti
+     iscritti, non il modello di business. Sui clienti, sulle masse o sui contratti
+     questi dati non dicono nulla, quindi non se ne deduce nulla. */
   var MODELS = [
-    { key: 'Boutique',   label: 'Boutique (1-3 CF)',   varName: '--series-1' },
-    { key: 'Intermedia', label: 'Intermedia (4-7 CF)', varName: '--series-2' },
-    { key: 'Rete',       label: 'Rete (8+ CF)',        varName: '--series-3' }
+    { key: 'Boutique',   label: '1-3 consulenti', varName: '--series-1' },
+    { key: 'Intermedia', label: '4-7 consulenti', varName: '--series-2' },
+    { key: 'Rete',       label: '8+ consulenti',  varName: '--series-3' }
   ];
   var MODEL_COLOR = {};
   MODELS.forEach(function (m) { MODEL_COLOR[m.key] = 'var(' + m.varName + ')'; });
@@ -350,7 +353,7 @@
       return { lab: c.lab, n: g.length, v: median(g.map(function (r) { return r.fatt_per_cf; })) };
     }).filter(function (c) { return c.n > 0; });
 
-    var L = 70, R = 16, T = 14, B = 52, w = 560 - L - R, h = 330 - T - B;
+    var L = 70, R = 16, T = 14, B = 64, w = 560 - L - R, h = 330 - T - B;
     if (!classes.length) { svg.appendChild(txt(L, T + h / 2, 'Nessun dato.', { size: 13 })); return; }
     var sc = niceScale(Math.max.apply(null, classes.map(function (c) { return c.v || 0; })), 4);
     var max = sc.max;
@@ -371,6 +374,8 @@
       svg.appendChild(p);
       svg.appendChild(txt(x + bw / 2, y - 7, eurShort(c.v), { anchor: 'middle', size: 11, fill: 'var(--text-secondary)', weight: 620, tabular: true }));
       svg.appendChild(txt(x + bw / 2, T + h + 18, c.lab, { anchor: 'middle', size: 11.5, fill: 'var(--text-secondary)' }));
+      /* la numerosita' e' parte del dato: su 2 societa' una mediana non descrive una classe */
+      svg.appendChild(txt(x + bw / 2, T + h + 32, 'n=' + c.n, { anchor: 'middle', size: 10, tabular: true }));
       var ht = el('rect', { x: L + band * i, y: T, width: band, height: h });
       ht.style.fill = 'transparent'; ht.style.cursor = 'pointer';
       hit(ht, c.lab + (c.lab === '1' ? ' consulente' : ' consulenti'), [
@@ -379,7 +384,7 @@
       ]);
       svg.appendChild(ht);
     });
-    svg.appendChild(txt(L + w / 2, T + h + 42, 'consulenti per società', { anchor: 'middle', size: 12, fill: 'var(--text-secondary)' }));
+    svg.appendChild(txt(L + w / 2, T + h + 54, 'consulenti per società', { anchor: 'middle', size: 12, fill: 'var(--text-secondary)' }));
   }
 
   /* ================= ISTOGRAMMA fatturato/CF ================= */
@@ -681,28 +686,47 @@
     var re = b.filter(function (r) { return r.n_cf >= 8; });
     var mb = median(bo.map(function (r) { return r.fatt_per_cf; }));
     var mr = median(re.map(function (r) { return r.fatt_per_cf; }));
+    /* stesso confronto a parita' di anzianita': isola l'effetto "societa' giovane" */
+    var oldB = bo.filter(function (r) { return r.anno_cost && r.anno_cost <= 2021; });
+    var oldR = re.filter(function (r) { return r.anno_cost && r.anno_cost <= 2021; });
+    var mb2 = median(oldB.map(function (r) { return r.fatt_per_cf; }));
+    var mr2 = median(oldR.map(function (r) { return r.fatt_per_cf; }));
 
     var co = document.getElementById('modelCallout');
     co.textContent = '';
     var p = document.createElement('p');
     if (mb && mr) {
-      p.appendChild(document.createTextNode('Le società fino a 3 consulenti fatturano '));
+      p.appendChild(document.createTextNode('In mediana le società fino a 3 consulenti fatturano '));
       var st = document.createElement('strong');
       st.textContent = nf1.format(mb / mr) + ' volte';
       p.appendChild(st);
-      p.appendChild(document.createTextNode(' per consulente rispetto a quelle con 8 o più. Non è l\'effetto di pochi casi estremi: il calo attraversa tutta la scala dimensionale.'));
+      p.appendChild(document.createTextNode(' per consulente rispetto a quelle con 8 o più'));
+      if (mb2 && mr2) {
+        p.appendChild(document.createTextNode('; restringendo alle sole società costituite entro il 2021 il rapporto è ' +
+          nf1.format(mb2 / mr2) + ' volte, quindi non è un effetto dell\'età delle società.'));
+      } else { p.appendChild(document.createTextNode('.')); }
+      var p2 = document.createElement('p');
+      p2.style.marginBottom = '0';
+      p2.appendChild(document.createTextNode('Sono mediane, e nascondono una dispersione enorme: '));
+      var srt = re.slice().sort(function (x, y) { return y.fatt_per_cf - x.fatt_per_cf; });
+      if (srt.length > 1) {
+        var s2 = document.createElement('strong');
+        s2.textContent = 'fra le società con 8+ consulenti si va da ' + eur(srt[srt.length - 1].fatt_per_cf) +
+          ' a ' + eur(srt[0].fatt_per_cf);
+        p2.appendChild(s2);
+        p2.appendChild(document.createTextNode('. La classe dimensionale non descrive un modo di lavorare.'));
+      }
+      co.appendChild(p); co.appendChild(p2);
     } else {
-      p.textContent = 'Con questi filtri non ci sono abbastanza società per confrontare i due modelli.';
+      p.textContent = 'Con questi filtri non ci sono abbastanza società per il confronto.';
+      co.appendChild(p);
     }
-    co.appendChild(p);
 
     var host = document.getElementById('modelCards');
     host.textContent = '';
     [
-      { t: 'Boutique patrimoniale', c: MODEL_COLOR.Boutique, v: mb, n: bo.length,
-        d: 'Poche famiglie con patrimoni grandi e parcelle da migliaia di euro. Il portafoglio di ciascun consulente è a regime.' },
-      { t: 'Rete di consulenti', c: MODEL_COLOR.Rete, v: mr, n: re.length,
-        d: 'Molti clienti retail con ticket piccoli. E fra gli iscritti ci sono consulenti appena entrati: contano come teste, non ancora come ricavi.' }
+      { t: 'Fino a 3 consulenti', c: MODEL_COLOR.Boutique, v: mb, n: bo.length, v2: mb2, n2: oldB.length },
+      { t: '8 consulenti o più', c: MODEL_COLOR.Rete, v: mr, n: re.length, v2: mr2, n2: oldR.length }
     ].forEach(function (m) {
       var d = document.createElement('div'); d.className = 'model';
       var hd = document.createElement('div'); hd.className = 'h';
@@ -713,8 +737,10 @@
       var bg = document.createElement('div'); bg.className = 'big';
       bg.textContent = m.v == null ? '—' : eur(m.v);
       var sm = document.createElement('div'); sm.className = 'small';
-      sm.textContent = 'mediano per consulente · ' + m.n + ' società';
-      var ds = document.createElement('p'); ds.textContent = m.d;
+      sm.textContent = 'mediano per consulente · ' + m.n + ' società con bilancio';
+      var ds = document.createElement('p');
+      ds.textContent = m.v2 == null ? 'Base troppo piccola per il confronto a parità di anzianità.'
+        : 'Solo quelle costituite entro il 2021: ' + eur(m.v2) + ' (' + m.n2 + ' società).';
       d.appendChild(hd); d.appendChild(bg); d.appendChild(sm); d.appendChild(ds);
       host.appendChild(d);
     });

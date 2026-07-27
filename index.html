@@ -243,12 +243,12 @@ footer a{color:var(--text-secondary)}
       <select id="fReg"><option value="">Tutte</option></select>
     </div>
     <div class="fgroup">
-      <label for="fMod">Modello</label>
+      <label for="fMod">Dimensione</label>
       <select id="fMod">
         <option value="">Tutti</option>
-        <option value="Boutique">Boutique (1-3 CF)</option>
-        <option value="Intermedia">Intermedia (4-7 CF)</option>
-        <option value="Rete">Rete (8+ CF)</option>
+        <option value="Boutique">1-3 consulenti</option>
+        <option value="Intermedia">4-7 consulenti</option>
+        <option value="Rete">8+ consulenti</option>
       </select>
     </div>
     <div class="fgroup">
@@ -274,11 +274,12 @@ footer a{color:var(--text-secondary)}
   <section id="scala">
     <div class="sec-head">
       <div class="eyebrow">Il risultato principale</div>
-      <h2>La scala non paga</h2>
+      <h2>Il numero di consulenti spiega poco</h2>
       <p>
-        Ogni punto è una SCF: in orizzontale quanti consulenti ha, in verticale quanto fattura
-        ciascuno di loro. Se la struttura moltiplicasse la produttività, la nuvola salirebbe verso
-        destra. Fa l'opposto.
+        Ogni punto è una SCF: in orizzontale quanti consulenti ha iscritti, in verticale quanto
+        fattura la società per ciascuno di loro. La nuvola è larga due ordini di grandezza e la
+        pendenza è debole: <strong>il numero di consulenti spiega meno di un quarto</strong> della
+        variabilità del fatturato (R² 0,23).
       </p>
     </div>
 
@@ -296,8 +297,9 @@ footer a{color:var(--text-secondary)}
 
     <div class="grid2">
       <div class="card">
-        <h3>Il calo lungo la scala</h3>
-        <div class="sub">Fatturato mediano per consulente, per classe di dimensione. Scende da un capo all'altro, con un solo rimbalzo nella fascia 11-20.</div>
+        <h3>Per classe di dimensione</h3>
+        <div class="sub">Fatturato mediano per consulente. <strong>n</strong> è il numero di società su cui poggia
+          ciascuna mediana: le classi più grandi contano pochissime osservazioni.</div>
         <div class="chartbox"><svg class="chart" id="barClasse" role="img"
           aria-label="Barre: fatturato mediano per consulente per classe di numero di consulenti"></svg></div>
       </div>
@@ -313,7 +315,7 @@ footer a{color:var(--text-secondary)}
 
     <div class="two" id="modelCards"></div>
 
-    <h3 style="margin-top:30px">Prima di leggere il grafico: chi fattura a chi</h3>
+    <h3 style="margin-top:30px">Chi fattura a chi</h3>
     <p style="max-width:74ch;margin-top:10px;color:var(--text-secondary)">
       Il contratto di consulenza è fra il cliente e la società: <strong>è la SCF a fatturare
       all'investitore l'intera parcella</strong>. Il singolo consulente non fattura al cliente —
@@ -324,15 +326,29 @@ footer a{color:var(--text-secondary)}
       avere una clientela personale fatturata direttamente.
     </p>
     <p style="max-width:74ch;color:var(--text-secondary)">
-      Il divario è dunque <strong>reale, non un artefatto contabile</strong>. Se ne danno due
-      spiegazioni. La prima: <strong>essere iscritti non significa produrre</strong>. L'albo
-      registra un rapporto fra consulente e società, non un portafoglio: una rete che recluta in
-      fretta porta in albo professionisti appena entrati o ancora senza clienti, che contano come
-      teste ma non ancora come ricavi. La seconda: <strong>i segmenti di clientela sono
-      diversi</strong>. La boutique segue poche famiglie con patrimoni grandi e parcelle da
-      migliaia di euro; la rete serve molti clienti retail con ticket piccoli, spesso in
-      abbonamento. Sono due economie, non due gradi di bravura.
+      Il divario fra le classi è dunque <strong>reale, non un artefatto contabile</strong>. E non
+      dipende dall'età delle società: restringendo alle sole costituite entro il 2021 il rapporto
+      resta 2,4 volte, e fra queste la mediana è <strong>piatta da 1 a 5 consulenti</strong>
+      (138.216 €) per poi scendere a 75.454 € sopra i 5. Non è una discesa lungo tutta la scala:
+      è uno scalino.
     </p>
+
+    <div class="callout" style="border-left-color:var(--muted);background:var(--surface-1)">
+      <h3 style="margin-bottom:8px">Cosa questi dati <em>non</em> dicono</h3>
+      <p style="margin-bottom:8px">
+        Le fonti usate qui contengono bilanci e iscrizioni all'albo. <strong>Non contengono nulla
+        sui clienti</strong>: né quanti sono, né quanto è grande il patrimonio che affidano, né
+        come è costruita la parcella, né quanti dei consulenti iscritti abbiano un portafoglio
+        avviato.
+      </p>
+      <p style="margin-bottom:0">
+        Perciò questa pagina non afferma perché il fatturato per consulente vari così tanto.
+        Un fatturato basso per consulente può voler dire clienti piccoli, parcelle basse, oppure
+        consulenti iscritti che non hanno ancora prodotto — e da questi numeri <strong>le tre
+        ipotesi sono indistinguibili</strong>. Per separarle servirebbero il numero di clienti,
+        le masse in consulenza e i contratti: dati che non sono pubblici.
+      </p>
+    </div>
   </section>
 
   <!-- ============ DIMENSIONE E CONCENTRAZIONE ============ -->

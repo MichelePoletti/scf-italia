@@ -10,8 +10,9 @@ quanto fatturano, quanto guadagnano e quanti consulenti finanziari ci lavorano.
 - **109 società**, **522 rapporti di consulenza**, **51,2 milioni** di giro d'affari aggregato
 - Fatturato mediano per consulente: **98.303 €**
 - Crescita a perimetro costante: **+19,1% l'anno** (CAGR 2022-2024)
-- Il risultato controintuitivo: **più consulenti ha una SCF, meno produce ciascuno**
-  (129.757 € per le boutique fino a 3 consulenti contro 48.545 € per le reti da 8 in su)
+- Il numero di consulenti spiega **meno di un quarto** della variabilità del fatturato
+  (R² 0,23). In mediana le SCF fino a 3 consulenti fatturano 129.757 € per consulente contro
+  48.545 € di quelle con 8 o più — ma dentro quest'ultimo gruppo si va da 2.108 € a 272.325 €
 
 **Come si legge il dato.** Il contratto di consulenza è fra il cliente e la società: è la SCF
 a fatturare all'investitore l'intera parcella, mentre il consulente fattura alla società le
@@ -19,10 +20,11 @@ proprie provvigioni. Il fatturato di una SCF è quindi il ricavo *completo* dell
 tutti i suoi consulenti — e infatti, dei 514 consulenti legati a una SCF, **495 (il 96%)
 operano esclusivamente tramite essa**.
 
-Il divario è dunque reale, non contabile. Due le spiegazioni: **essere iscritti non significa
-produrre** (l'albo registra un rapporto, non un portafoglio, e le reti che reclutano in fretta
-portano in albo consulenti ancora senza clienti), e **i segmenti di clientela sono diversi**
-(poche famiglie con patrimoni grandi contro molti clienti retail con ticket piccoli).
+Il divario fra le classi è dunque reale e non contabile, e non dipende dall'età delle società
+(a parità di anzianità resta 2,4 volte). **Ma queste fonti non dicono perché.** Contengono
+bilanci e iscrizioni all'albo: nulla sui clienti, sulle masse in consulenza o sui contratti.
+Un fatturato basso per consulente può voler dire clienti piccoli, parcelle basse o consulenti
+iscritti che non hanno ancora prodotto — da questi numeri le tre ipotesi sono indistinguibili.
 
 ## Fonti
 
