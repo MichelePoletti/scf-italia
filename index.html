@@ -108,8 +108,12 @@ section{padding:46px 0 6px}
 .card > h3{margin-bottom:3px}
 .card .sub{color:var(--text-secondary);font-size:.9rem;margin-bottom:16px;max-width:78ch}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(392px,1fr));gap:18px}
-.chartbox{width:100%;overflow-x:auto}
+.chartbox{width:100%;overflow-x:auto;min-width:0}
 svg.chart{display:block;width:100%;height:auto;overflow:visible}
+/* gli elementi di griglia hanno min-width:auto: senza questo un SVG con min-width
+   allarga la traccia e fa scorrere l'intera pagina in orizzontale sui telefoni */
+.grid2 > *, .two > *, .kpis > *{min-width:0}
+.card, .model, .kpi, .tablewrap{min-width:0}
 
 /* ---------- filter row ---------- */
 .filters{
