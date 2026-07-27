@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le SCF italiane — fatturati e produttività per consulente</title>
+<meta name="description" content="Le 109 società di consulenza finanziaria iscritte all'albo OCF: fatturati, utili e quanto genera ogni consulente finanziario. Dati ufficiali OCF al 26/07/2026 e bilanci camerali.">
+<meta property="og:title" content="Le SCF italiane — fatturati e produttività per consulente">
+<meta property="og:description" content="109 società, 522 consulenti, 51,2 milioni di giro d'affari. E un risultato controintuitivo: più consulenti ha una SCF, meno produce ciascuno.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<style>
+:root{
+  color-scheme: light;
+  --surface-1:#fcfcfb; --page:#f9f9f7;
+  --text-primary:#0b0b0b; --text-secondary:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
+  --series-1:#2a78d6; --series-2:#eb6834; --series-3:#1baf7a;
+  --deemph:#c3c2b7;
+  --good:#0ca30c; --critical:#d03b3b;
+  --seq-100:#cde2fb; --seq-250:#86b6ef; --seq-450:#2a78d6; --seq-600:#184f95;
+  --shadow:0 1px 2px rgba(11,11,11,.04),0 4px 16px rgba(11,11,11,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme: dark;
+    --surface-1:#1a1a19; --page:#0d0d0d;
+    --text-primary:#ffffff; --text-secondary:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+    --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70;
+    --deemph:#383835;
+    --good:#0ca30c; --critical:#d03b3b;
+    --seq-100:#104281; --seq-250:#184f95; --seq-450:#3987e5; --seq-600:#86b6ef;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --surface-1:#1a1a19; --page:#0d0d0d;
+  --text-primary:#ffffff; --text-secondary:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+  --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70;
+  --deemph:#383835;
+  --seq-100:#104281; --seq-250:#184f95; --seq-450:#3987e5; --seq-600:#86b6ef;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.3);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--page); color:var(--text-primary);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+a{color:var(--series-1)}
+h1,h2,h3{line-height:1.25;margin:0}
+h1{font-size:clamp(1.9rem,4.4vw,3rem);font-weight:680;letter-spacing:-.02em}
+h2{font-size:clamp(1.25rem,2.4vw,1.6rem);font-weight:640;letter-spacing:-.01em}
+h3{font-size:1.02rem;font-weight:620}
+p{margin:0 0 1em}
+.lede{font-size:clamp(1.02rem,1.7vw,1.19rem);color:var(--text-secondary);max-width:70ch}
+.small{font-size:.86rem;color:var(--muted)}
+
+/* ---------- header ---------- */
+header.top{border-bottom:1px solid var(--border);background:var(--surface-1)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
+.brandmark{display:flex;align-items:center;gap:9px;font-weight:640;font-size:.93rem;letter-spacing:-.01em}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--series-1);flex:none}
+.tbtn{
+  background:var(--surface-1);border:1px solid var(--border);color:var(--text-secondary);
+  border-radius:8px;padding:7px 12px;font:inherit;font-size:.84rem;cursor:pointer;
+}
+.tbtn:hover{color:var(--text-primary);border-color:var(--axis)}
+.hero{padding:52px 0 40px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.tag{
+  font-size:.78rem;color:var(--text-secondary);background:var(--surface-1);
+  border:1px solid var(--border);border-radius:999px;padding:5px 12px;
+}
+
+/* ---------- hero figure + KPI ---------- */
+.herofig{
+  background:var(--surface-1);border:1px solid var(--border);border-radius:16px;
+  padding:30px 32px;margin:34px 0 0;box-shadow:var(--shadow);
+}
+.herofig .val{font-size:clamp(3rem,8.6vw,5rem);font-weight:700;letter-spacing:-.035em;line-height:1}
+.herofig .lab{color:var(--text-secondary);margin-top:10px;max-width:62ch}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:14px;margin-top:14px}
+.kpi{background:var(--surface-1);border:1px solid var(--border);border-radius:13px;padding:17px 19px;box-shadow:var(--shadow)}
+.kpi .k{font-size:.79rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.kpi .v{font-size:1.72rem;font-weight:660;letter-spacing:-.02em;margin-top:5px;line-height:1.1}
+.kpi .s{font-size:.83rem;color:var(--text-secondary);margin-top:3px}
+
+/* ---------- sections ---------- */
+section{padding:46px 0 6px}
+.sec-head{max-width:74ch;margin-bottom:22px}
+.sec-head h2{margin-bottom:10px}
+.sec-head p{color:var(--text-secondary);margin-bottom:0}
+.eyebrow{
+  font-size:.76rem;font-weight:680;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--series-1);margin-bottom:9px;
+}
+.card{
+  background:var(--surface-1);border:1px solid var(--border);border-radius:16px;
+  padding:22px 24px 18px;box-shadow:var(--shadow);margin-bottom:18px;
+}
+.card > h3{margin-bottom:3px}
+.card .sub{color:var(--text-secondary);font-size:.9rem;margin-bottom:16px;max-width:78ch}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(392px,1fr));gap:18px}
+.chartbox{width:100%;overflow-x:auto}
+svg.chart{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- filter row ---------- */
+.filters{
+  position:sticky;top:0;z-index:30;background:var(--page);
+  border-bottom:1px solid var(--border);padding:12px 0;margin-bottom:6px;
+}
+.filters .inner{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.fgroup{display:flex;align-items:center;gap:7px}
+.fgroup label{font-size:.8rem;color:var(--muted);font-weight:600}
+select,input[type=search]{
+  font:inherit;font-size:.87rem;padding:7px 11px;border-radius:9px;
+  border:1px solid var(--border);background:var(--surface-1);color:var(--text-primary);
+}
+select:focus-visible,input:focus-visible,.tbtn:focus-visible,th[role=button]:focus-visible,.chk:focus-within{
+  outline:2px solid var(--series-1);outline-offset:2px
+}
+.chk{display:flex;align-items:center;gap:7px;font-size:.87rem;color:var(--text-secondary);cursor:pointer}
+.fcount{margin-left:auto;font-size:.83rem;color:var(--muted)}
+.reset{background:none;border:none;color:var(--series-1);font:inherit;font-size:.83rem;cursor:pointer;padding:4px 2px;text-decoration:underline}
+
+/* ---------- legend ---------- */
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 14px}
+.legend .it{display:flex;align-items:center;gap:7px;font-size:.85rem;color:var(--text-secondary);cursor:pointer;user-select:none}
+.legend .it.off{opacity:.38}
+.legend .sw{width:11px;height:11px;border-radius:3px;flex:none}
+.legend .swl{width:16px;height:3px;border-radius:2px;flex:none}
+
+/* ---------- tooltip ---------- */
+.tip{
+  position:fixed;z-index:60;pointer-events:none;opacity:0;transition:opacity .1s;
+  background:var(--surface-1);border:1px solid var(--border);border-radius:11px;
+  box-shadow:0 5px 22px rgba(0,0,0,.16);padding:11px 13px;max-width:290px;
+}
+.tip .t-name{font-size:.83rem;color:var(--text-secondary);margin-bottom:5px;font-weight:560;line-height:1.35}
+.tip .t-row{display:flex;align-items:baseline;gap:8px;font-size:.84rem;color:var(--text-secondary);margin-top:3px}
+.tip .t-key{width:14px;height:3px;border-radius:2px;flex:none;align-self:center}
+.tip .t-val{font-weight:680;color:var(--text-primary);font-size:.95rem;font-variant-numeric:tabular-nums}
+.tip .t-lab{color:var(--muted)}
+
+/* ---------- table ---------- */
+.tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:13px;background:var(--surface-1)}
+table{border-collapse:collapse;width:100%;font-size:.865rem;min-width:1080px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--grid);white-space:nowrap}
+th{
+  background:var(--surface-1);position:sticky;top:0;z-index:5;font-weight:640;font-size:.79rem;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.04em;cursor:pointer;user-select:none;
+}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+th:hover{color:var(--text-primary)}
+th .ar{opacity:.4;font-size:.72rem}
+th[aria-sort] .ar{opacity:1;color:var(--series-1)}
+tbody tr:hover{background:color-mix(in srgb,var(--series-1) 6%,transparent)}
+td.name{white-space:normal;min-width:270px;font-weight:560}
+.pill{display:inline-block;font-size:.72rem;font-weight:640;padding:2px 8px;border-radius:999px;border:1px solid var(--border);color:var(--text-secondary)}
+.pill .pd{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:baseline}
+.neg{color:var(--critical)} .pos{color:var(--good)}
+
+/* ---------- callout ---------- */
+.callout{
+  border-left:3px solid var(--series-1);background:color-mix(in srgb,var(--series-1) 5%,var(--surface-1));
+  padding:16px 20px;border-radius:0 12px 12px 0;margin:20px 0;
+}
+.callout p:last-child{margin-bottom:0}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(288px,1fr));gap:18px;margin-top:6px}
+.model{background:var(--surface-1);border:1px solid var(--border);border-radius:14px;padding:19px 21px;box-shadow:var(--shadow)}
+.model .h{display:flex;align-items:center;gap:9px;font-weight:640;margin-bottom:8px}
+.model .big{font-size:1.85rem;font-weight:680;letter-spacing:-.02em;line-height:1.15}
+.model p{font-size:.9rem;color:var(--text-secondary);margin:8px 0 0}
+details{background:var(--surface-1);border:1px solid var(--border);border-radius:13px;padding:15px 20px;margin-bottom:11px}
+details summary{cursor:pointer;font-weight:620;font-size:.96rem}
+details[open] summary{margin-bottom:11px}
+details p,details li{color:var(--text-secondary);font-size:.92rem}
+footer{border-top:1px solid var(--border);margin-top:56px;padding:30px 0 46px;color:var(--muted);font-size:.86rem}
+footer a{color:var(--text-secondary)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:640px){
+  .grid2,.two{grid-template-columns:1fr}
+  .card{padding:18px 15px 14px}
+  .herofig{padding:24px 20px}
+  .filters .inner{gap:8px}
+  .fcount{width:100%;margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap topbar">
+    <div class="brandmark"><span class="dot"></span> Analisi SCF · albo OCF</div>
+    <button class="tbtn" id="themeBtn" type="button" aria-label="Cambia tema chiaro/scuro">Tema</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Consulenza finanziaria indipendente in Italia</div>
+    <h1>Quanto fatturano le SCF<br>e quanto genera ogni consulente</h1>
+    <p class="lede" style="margin-top:16px">
+      Le <strong>109 società di consulenza finanziaria</strong> iscritte all'albo OCF, i loro bilanci
+      e il numero di consulenti che ci lavorano. Con un risultato che ribalta l'intuizione:
+      più consulenti ha una SCF, meno produce ciascuno.
+    </p>
+    <div class="meta">
+      <span class="tag">Albo OCF al 26/07/2026</span>
+      <span class="tag">Bilanci: ultimo esercizio depositato</span>
+      <span class="tag">109 società · 522 rapporti di consulenza</span>
+    </div>
+
+    <div class="herofig">
+      <div class="val" id="heroVal">—</div>
+      <div class="lab">
+        è il <strong>fatturato mediano per consulente finanziario</strong>: metà delle SCF con
+        bilancio disponibile sta sotto questa soglia. La forbice va da 360 € a 2,86 milioni.
+      </div>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+  </div>
+</div>
+
+<!-- ============ FILTRI: valgono per tutto ciò che segue ============ -->
+<div class="filters" id="filterRow">
+  <div class="wrap inner">
+    <div class="fgroup">
+      <label for="fReg">Regione</label>
+      <select id="fReg"><option value="">Tutte</option></select>
+    </div>
+    <div class="fgroup">
+      <label for="fMod">Modello</label>
+      <select id="fMod">
+        <option value="">Tutti</option>
+        <option value="Boutique">Boutique (1-3 CF)</option>
+        <option value="Intermedia">Intermedia (4-7 CF)</option>
+        <option value="Rete">Rete (8+ CF)</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label for="fAnno">Costituita</label>
+      <select id="fAnno">
+        <option value="">Qualsiasi anno</option>
+        <option value="-2009">fino al 2009</option>
+        <option value="2010-2018">2010-2018</option>
+        <option value="2019-2021">2019-2021</option>
+        <option value="2022-2023">2022-2023</option>
+        <option value="2024-">dal 2024</option>
+      </select>
+    </div>
+    <label class="chk"><input type="checkbox" id="fBil"> Solo con bilancio</label>
+    <button class="reset" id="fReset" type="button">Azzera</button>
+    <span class="fcount" id="fCount"></span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============ IL RISULTATO PRINCIPALE ============ -->
+  <section id="scala">
+    <div class="sec-head">
+      <div class="eyebrow">Il risultato principale</div>
+      <h2>La scala non paga</h2>
+      <p>
+        Ogni punto è una SCF: in orizzontale quanti consulenti ha, in verticale quanto fattura
+        ciascuno di loro. Se la struttura moltiplicasse la produttività, la nuvola salirebbe verso
+        destra. Fa l'opposto.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Consulenti e fatturato per consulente</h3>
+      <div class="sub">Entrambi gli assi sono logaritmici. Passa il puntatore su un punto per il dettaglio.</div>
+      <div class="legend" id="legScatter"></div>
+      <div class="chartbox"><svg class="chart" id="scatter" role="img"
+        aria-label="Grafico a dispersione: numero di consulenti contro fatturato per consulente, per ciascuna SCF"></svg></div>
+      <p class="small" style="margin:12px 0 0">
+        La retta grigia è la regressione sui dati filtrati. I valori esatti di ogni società sono
+        nella <a href="#tabella">tabella in fondo</a>.
+      </p>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>Il calo lungo la scala</h3>
+        <div class="sub">Fatturato mediano per consulente, per classe di dimensione. Scende da un capo all'altro, con un solo rimbalzo nella fascia 11-20.</div>
+        <div class="chartbox"><svg class="chart" id="barClasse" role="img"
+          aria-label="Barre: fatturato mediano per consulente per classe di numero di consulenti"></svg></div>
+      </div>
+      <div class="card">
+        <h3>Come si distribuisce</h3>
+        <div class="sub">Quante SCF stanno in ciascuna fascia di fatturato per consulente.</div>
+        <div class="chartbox"><svg class="chart" id="histo" role="img"
+          aria-label="Istogramma della distribuzione del fatturato per consulente"></svg></div>
+      </div>
+    </div>
+
+    <div class="callout" id="modelCallout"></div>
+
+    <div class="two" id="modelCards"></div>
+
+    <p style="max-width:74ch;margin-top:22px;color:var(--text-secondary)">
+      La spiegazione non è che i professionisti delle reti lavorino meno. È che nell'albo
+      convivono <strong>due modelli di business diversi</strong>. Nella boutique patrimoniale tutto
+      il fatturato passa dalla società. Nella rete di affiliati la SCF fa da piattaforma — marchio,
+      compliance, strumenti — e il consulente fattura in larga parte con partita IVA propria: alla
+      società arriva solo una quota. Per questo <strong>il fatturato per consulente non misura la
+      produttività del professionista</strong>, ma quanta parte del suo lavoro transita per il
+      bilancio della società.
+    </p>
+  </section>
+
+  <!-- ============ DIMENSIONE E CONCENTRAZIONE ============ -->
+  <section id="mercato">
+    <div class="sec-head">
+      <div class="eyebrow">Dimensione del mercato</div>
+      <h2>Un settore piccolo, giovane e frammentato</h2>
+      <p>
+        Il giro d'affari complessivo è dell'ordine di una media impresa. La metà delle società
+        non arriva a due consulenti, e nessuna domina il mercato.
+      </p>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>Concentrazione</h3>
+        <div class="sub">Quota cumulata del giro d'affari, dalla società più grande in giù.</div>
+        <div class="chartbox"><svg class="chart" id="conc" role="img"
+          aria-label="Curva di concentrazione: quota cumulata del fatturato per numero di società"></svg></div>
+      </div>
+      <div class="card">
+        <h3>Quanti consulenti per società</h3>
+        <div class="sub">Numero di SCF per numero di consulenti iscritti.</div>
+        <div class="chartbox"><svg class="chart" id="histoCF" role="img"
+          aria-label="Istogramma del numero di consulenti per società"></svg></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Dove sono</h3>
+      <div class="sub">Fatturato aggregato per regione. Il colore è più intenso dove il fatturato per consulente è più alto.</div>
+      <div class="chartbox"><svg class="chart" id="regioni" role="img"
+        aria-label="Barre orizzontali: fatturato aggregato per regione"></svg></div>
+    </div>
+  </section>
+
+  <!-- ============ CRESCITA ============ -->
+  <section id="crescita">
+    <div class="sec-head">
+      <div class="eyebrow">Andamento</div>
+      <h2>Cresce, e in fretta</h2>
+      <p>
+        Confronto a perimetro costante: solo le società che hanno depositato il bilancio in tutti
+        e tre gli anni, così l'aumento non dipende dall'ingresso di nuovi operatori.
+      </p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>Fatturato aggregato a perimetro costante</h3>
+        <div class="sub" id="subCrescita">—</div>
+        <div class="chartbox"><svg class="chart" id="chartCrescita" role="img"
+          aria-label="Colonne: fatturato aggregato per anno a perimetro costante"></svg></div>
+      </div>
+      <div class="card">
+        <h3>Anno di costituzione</h3>
+        <div class="sub">Quante delle SCF oggi iscritte sono nate in ciascun periodo.</div>
+        <div class="chartbox"><svg class="chart" id="vintage" role="img"
+          aria-label="Colonne: numero di SCF per periodo di costituzione"></svg></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TABELLA ============ -->
+  <section id="tabella">
+    <div class="sec-head">
+      <div class="eyebrow">I dati</div>
+      <h2>Tutte le società</h2>
+      <p>
+        Ogni valore mostrato nei grafici è qui in chiaro. Clicca un'intestazione per ordinare,
+        cerca per nome, comune o partita IVA.
+      </p>
+    </div>
+    <div class="card">
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px">
+        <input type="search" id="q" placeholder="Cerca società, comune o P.IVA…" style="flex:1;min-width:230px" aria-label="Cerca nella tabella">
+        <button class="tbtn" id="csvBtn" type="button">Scarica CSV</button>
+      </div>
+      <div class="tablewrap">
+        <table id="tbl">
+          <caption class="vh">Elenco delle società di consulenza finanziaria con fatturato, utile e consulenti</caption>
+          <thead><tr id="thead"></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <p class="small" style="margin:12px 0 0" id="tblNote"></p>
+    </div>
+  </section>
+
+  <!-- ============ METODO ============ -->
+  <section id="metodo">
+    <div class="sec-head">
+      <div class="eyebrow">Metodo</div>
+      <h2>Da dove vengono i numeri</h2>
+    </div>
+
+    <details open>
+      <summary>Fonti</summary>
+      <p><strong>Albo.</strong> Elenchi ufficiali OCF (Organismo di vigilanza e tenuta dell'albo unico
+      dei Consulenti Finanziari), aggiornati al 26 luglio 2026: elenco delle società di consulenza
+      finanziaria e elenco dei consulenti finanziari autonomi.</p>
+      <p><strong>Bilanci.</strong> Registro imprese, ultimo esercizio depositato disponibile: 69 società
+      con bilancio 2024, 14 con bilancio 2025, una con bilancio 2023.</p>
+    </details>
+
+    <details>
+      <summary>Controlli fatti</summary>
+      <ul>
+        <li>Il conteggio dei consulenti è incrociato in doppio: quelli elencati nella scheda di ogni
+        SCF e quelli ricavati dall'elenco dei consulenti autonomi. <strong>522 = 522</strong>, zero disallineamenti.</li>
+        <li>Tutte e 109 le società sono agganciate al registro imprese con verifica di denominazione
+        <em>e</em> comune. Nessuna partita IVA duplicata o mancante.</li>
+        <li>Le cifre sono validate contro una seconda fonte indipendente su Consultique: fatturato e
+        utile 2023 e 2024 coincidono all'euro.</li>
+      </ul>
+    </details>
+
+    <details>
+      <summary>Limiti da tenere presenti</summary>
+      <ul>
+        <li>Il fatturato è quello del bilancio depositato: per le società che svolgono anche attività
+        diverse dalla consulenza finanziaria include tutto, non solo le parcelle.</li>
+        <li>Gli esercizi non sono tutti omogenei. Il confronto di crescita usa il perimetro costante
+        proprio per correggere questa distorsione.</li>
+        <li>25 società non hanno bilancio disponibile, quindi il giro d'affari reale del settore è un
+        po' superiore a quello misurato. Di queste, 19 sono nate dal 2024 e il primo bilancio non è
+        ancora dovuto; per le altre 6 nessuno di cinque provider dispone dei dati.</li>
+        <li>Due società chiudono con utile superiore al fatturato (proventi non caratteristici):
+        per loro il margine non è un indicatore leggibile.</li>
+        <li>Il fatturato per consulente misura quanto passa dalla società, non quanto guadagna il
+        professionista.</li>
+      </ul>
+    </details>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p style="margin-bottom:6px">
+      Elaborazione su dati pubblici <a href="https://www.organismocf.it/portal/web/portale-ocf/elenchi-iscritti" target="_blank" rel="noopener">OCF</a>
+      e registro imprese. Aggiornamento albo: 26 luglio 2026.
+    </p>
+    <p style="margin:0">I dati sono forniti a scopo informativo e non costituiscono consulenza finanziaria.</p>
+  </div>
+</footer>
+
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
