@@ -13,11 +13,16 @@ quanto fatturano, quanto guadagnano e quanti consulenti finanziari ci lavorano.
 - Il risultato controintuitivo: **più consulenti ha una SCF, meno produce ciascuno**
   (129.757 € per le boutique fino a 3 consulenti contro 48.545 € per le reti da 8 in su)
 
-La spiegazione è che nell'albo convivono due modelli di business diversi. Nella boutique
-patrimoniale tutto il fatturato passa dalla società; nella rete di affiliati la SCF fa da
-piattaforma e il consulente fattura in larga parte con partita IVA propria. Per questo il
-fatturato per consulente **non misura la produttività del professionista**, ma quanta parte
-del suo lavoro transita per il bilancio della società.
+**Come si legge il dato.** Il contratto di consulenza è fra il cliente e la società: è la SCF
+a fatturare all'investitore l'intera parcella, mentre il consulente fattura alla società le
+proprie provvigioni. Il fatturato di una SCF è quindi il ricavo *completo* dell'attività di
+tutti i suoi consulenti — e infatti, dei 514 consulenti legati a una SCF, **495 (il 96%)
+operano esclusivamente tramite essa**.
+
+Il divario è dunque reale, non contabile. Due le spiegazioni: **essere iscritti non significa
+produrre** (l'albo registra un rapporto, non un portafoglio, e le reti che reclutano in fretta
+portano in albo consulenti ancora senza clienti), e **i segmenti di clientela sono diversi**
+(poche famiglie con patrimoni grandi contro molti clienti retail con ticket piccoli).
 
 ## Fonti
 

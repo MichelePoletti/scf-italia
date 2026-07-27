@@ -700,9 +700,9 @@
     host.textContent = '';
     [
       { t: 'Boutique patrimoniale', c: MODEL_COLOR.Boutique, v: mb, n: bo.length,
-        d: 'Uno o due professionisti, clientela private o family office, parcelle alte. Tutto il fatturato passa dalla società.' },
-      { t: 'Rete di affiliati', c: MODEL_COLOR.Rete, v: mr, n: re.length,
-        d: 'La SCF fa da piattaforma: marchio, compliance, strumenti. I consulenti fatturano in proprio e alla società arriva una quota.' }
+        d: 'Poche famiglie con patrimoni grandi e parcelle da migliaia di euro. Il portafoglio di ciascun consulente è a regime.' },
+      { t: 'Rete di consulenti', c: MODEL_COLOR.Rete, v: mr, n: re.length,
+        d: 'Molti clienti retail con ticket piccoli. E fra gli iscritti ci sono consulenti appena entrati: contano come teste, non ancora come ricavi.' }
     ].forEach(function (m) {
       var d = document.createElement('div'); d.className = 'model';
       var hd = document.createElement('div'); hd.className = 'h';
