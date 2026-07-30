@@ -7,12 +7,17 @@ quanto fatturano, quanto guadagnano e quanti consulenti finanziari ci lavorano.
 
 ## Cosa mostra
 
-- **109 società**, **522 rapporti di consulenza**, **51,2 milioni** di giro d'affari aggregato
-- Fatturato mediano per consulente **iscritto all'albo**: **98.303 €**
+- **109 società**, **522 rapporti di consulenza**, **52,0 milioni** di giro d'affari aggregato
+- Fatturato mediano per consulente **iscritto all'albo**: **98.325 €** (85 società con bilancio)
 - Crescita a perimetro costante: **+19,1% l'anno** (CAGR 2022-2024)
 - Il numero di consulenti spiega **meno di un quarto** della variabilità del fatturato
   (R² 0,23). In mediana le SCF fino a 3 consulenti fatturano 129.757 € per consulente contro
   48.545 € di quelle con 8 o più — ma dentro quest'ultimo gruppo si va da 2.108 € a 272.325 €
+
+**Consulenti, dipendenti e addetti sono variabili distinte.** Per nove società conosco il numero
+esatto di dipendenti: Tack ha 1 consulente iscritto e 6 dipendenti, quindi passa da 2,86 M
+«per consulente» a 409 K per persona; Consultique ha 18 iscritti e 24 dipendenti e scende da
+272 K a 117 K. Il sito riporta entrambe le grandezze e la loro somma.
 
 **Attenzione al denominatore.** Nelle SCF lavorano anche dipendenti, il cui numero esatto non
 è pubblico (il registro imprese lo dà a fasce, e per 45 società su 109 non lo dà affatto).
