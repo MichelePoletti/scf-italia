@@ -230,11 +230,15 @@
 
     document.getElementById('heroVal').textContent = medPer == null ? '—' : eur(medPer);
 
+    var conDipNoti = b.filter(function (r) { return r.fatt_per_addetto != null; });
+    var medPerPersona = median(conDipNoti.map(function (r) { return r.fatt_per_addetto; }));
+
     var items = [
       { k: 'Società', v: nfInt.format(rows.length), s: b.length + ' con bilancio' },
       { k: 'Consulenti', v: nfInt.format(cfTot), s: cfBil + ' coperti da bilancio' },
       { k: 'Giro d\'affari', v: eurShort(tot), s: 'ultimo esercizio' },
       { k: 'Fatturato mediano', v: eurShort(median(b.map(function (r) { return r.fatt_ult; }))), s: 'per società' },
+      { k: 'Per persona al lavoro', v: medPerPersona == null ? '—' : eurShort(medPerPersona), s: conDipNoti.length + ' soc. con dipendenti noti' },
       { k: 'Utile aggregato', v: eurShort(sum(utili)), s: utili.filter(function (u) { return u > 0; }).length + ' in utile · ' + utili.filter(function (u) { return u < 0; }).length + ' in perdita' }
     ];
     var host = document.getElementById('kpis');
@@ -266,6 +270,7 @@
     if (isLog) {
       xMin = 0; xMax = lx(Math.max(100, Math.max.apply(null, pts.map(function (p) { return p.n_cf; }))));
       var yv = pts.map(function (p) { return lx(p.fatt_per_cf); });
+      pts.forEach(function (p) { if (p.fatt_per_addetto > 0) yv.push(lx(p.fatt_per_addetto)); });
       yMin = Math.floor(Math.min.apply(null, yv)); yMax = Math.ceil(Math.max.apply(null, yv));
       if (yMax - yMin < 1) yMax = yMin + 1;
       for (var e = yMin; e <= yMax; e++) yTicks.push(Math.pow(10, e));
@@ -327,13 +332,29 @@
       var ht = el('circle', { cx: cx, cy: cy, r: 13 });
       ht.style.fill = 'transparent'; ht.style.cursor = 'pointer';
       g.appendChild(c); g.appendChild(ht);
-      hit(ht, p.denominazione, [
+      var scTipRows = [
         { value: eur(p.fatt_per_cf), label: 'per consulente', color: MODEL_COLOR[p.modello] },
         { value: eur(p.fatt_ult), label: 'fatturato ' + (p.anno_ult || '') },
         { value: String(p.n_cf), label: p.n_cf === 1 ? 'consulente' : 'consulenti' },
         { value: p.comune, label: '(' + p.provincia + ')' }
-      ]);
+      ];
+      if (p.fatt_per_addetto != null) {
+        scTipRows.splice(1, 0, { value: eur(p.fatt_per_addetto), label: 'per persona al lavoro (' + p.addetti_noti + ')', color: 'var(--seq-600)' });
+      }
+      hit(ht, p.denominazione, scTipRows);
       svg.appendChild(g);
+    });
+
+    // punti secondari: fatt_per_addetto per le società con dipendenti noti
+    pts.filter(function (p) { return p.fatt_per_addetto != null; }).forEach(function (p) {
+      var cx = X(p.n_cf), cyMain = Y(p.fatt_per_cf), cyAdd = Y(p.fatt_per_addetto);
+      if (cyAdd < T || cyAdd > T + h) return;
+      var ln = el('line', { x1: cx, y1: cyMain, x2: cx, y2: cyAdd });
+      ln.style.stroke = 'var(--seq-600)'; ln.style.strokeWidth = '1.5'; ln.style.strokeDasharray = '3,2';
+      svg.appendChild(ln);
+      var c2 = el('circle', { cx: cx, cy: cyAdd, r: 4 });
+      c2.style.fill = 'var(--seq-600)'; c2.style.stroke = 'var(--surface-1)'; c2.style.strokeWidth = '2';
+      svg.appendChild(c2);
     });
 
     // etichette dirette solo sugli estremi (mai un numero su ogni punto)
@@ -366,6 +387,13 @@
       });
       host.appendChild(d);
     });
+    // etichetta non cliccabile per i pallini "per persona al lavoro"
+    var extra = document.createElement('span'); extra.className = 'it';
+    var sw2 = document.createElement('span'); sw2.className = 'sw';
+    sw2.style.background = 'var(--seq-600)'; sw2.style.borderRadius = '50%';
+    var tx2 = document.createElement('span'); tx2.textContent = 'per persona al lavoro (9 soc. con dipend. noti)';
+    extra.appendChild(sw2); extra.appendChild(tx2);
+    host.appendChild(extra);
   }
 
   /* ================= BARRE: classi di dimensione ================= */
