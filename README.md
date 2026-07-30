@@ -8,11 +8,17 @@ quanto fatturano, quanto guadagnano e quanti consulenti finanziari ci lavorano.
 ## Cosa mostra
 
 - **109 società**, **522 rapporti di consulenza**, **51,2 milioni** di giro d'affari aggregato
-- Fatturato mediano per consulente: **98.303 €**
+- Fatturato mediano per consulente **iscritto all'albo**: **98.303 €**
 - Crescita a perimetro costante: **+19,1% l'anno** (CAGR 2022-2024)
 - Il numero di consulenti spiega **meno di un quarto** della variabilità del fatturato
   (R² 0,23). In mediana le SCF fino a 3 consulenti fatturano 129.757 € per consulente contro
   48.545 € di quelle con 8 o più — ma dentro quest'ultimo gruppo si va da 2.108 € a 272.325 €
+
+**Attenzione al denominatore.** Nelle SCF lavorano anche dipendenti, il cui numero esatto non
+è pubblico (il registro imprese lo dà a fasce, e per 45 società su 109 non lo dà affatto).
+Sotto ipotesi diverse sui dipendenti il confronto fra società piccole e grandi **cambia di
+segno**: 2,67x → 1,16x → 0,57x. Quindi da questi dati non si può dire quale classe sia più
+produttiva per persona, e la pagina lo dichiara esplicitamente.
 
 **Come si legge il dato.** Il contratto di consulenza è fra il cliente e la società: è la SCF
 a fatturare all'investitore l'intera parcella, mentre il consulente fattura alla società le
@@ -20,11 +26,10 @@ proprie provvigioni. Il fatturato di una SCF è quindi il ricavo *completo* dell
 tutti i suoi consulenti — e infatti, dei 514 consulenti legati a una SCF, **495 (il 96%)
 operano esclusivamente tramite essa**.
 
-Il divario fra le classi è dunque reale e non contabile, e non dipende dall'età delle società
-(a parità di anzianità resta 2,4 volte). **Ma queste fonti non dicono perché.** Contengono
-bilanci e iscrizioni all'albo: nulla sui clienti, sulle masse in consulenza o sui contratti.
-Un fatturato basso per consulente può voler dire clienti piccoli, parcelle basse o consulenti
-iscritti che non hanno ancora prodotto — da questi numeri le tre ipotesi sono indistinguibili.
+**Queste fonti non dicono perché.** Contengono bilanci e iscrizioni all'albo: nulla sui clienti,
+sulle masse in consulenza o sui contratti, e non il numero esatto di dipendenti. Un fatturato
+basso per iscritto può voler dire clienti piccoli, parcelle basse o consulenti che non hanno
+ancora prodotto — da questi numeri le ipotesi sono indistinguibili.
 
 ## Fonti
 

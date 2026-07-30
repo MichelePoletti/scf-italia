@@ -174,7 +174,27 @@
   /* ---------------- stato + filtri ---------------- */
   /* soloBil parte spento: la pagina apre sull'albo intero (109 società). I grafici
      economici filtrano comunque da sé le società senza bilancio, via withBil(). */
-  var state = { reg: '', mod: '', anno: '', soloBil: false, q: '', sort: 'fatt_ult', dir: -1, hidden: {} };
+  var state = { reg: '', mod: '', anno: '', soloBil: false, q: '', sort: 'fatt_ult', dir: -1,
+                hidden: {}, scale: 'log' };
+
+  /* ---------------- forza lavoro: fasce, non numeri esatti ----------------
+     Il registro imprese pubblica i dipendenti a fasce ('0-9', '10-24'), non il
+     numero esatto, e per 45 societa' su 109 il dato manca. Da qui si possono
+     ricavare solo limiti, non un valore. */
+  var BANDS = { '0-9': [0, 9], '10-24': [10, 24], '25-49': [25, 49], '50-99': [50, 99] };
+  function dipBand(r) {
+    var v = (r.dipendenti || '-').trim();
+    return BANDS[v] || null;            // null = fascia ignota
+  }
+  function addettiMax(r, ignoti) {
+    var band = dipBand(r);
+    var up = band ? band[1] : (ignoti == null ? 0 : ignoti);
+    return r.n_cf + up;
+  }
+  function perAddettoMin(r, ignoti) {   // il piu' basso: piu' teste possibili
+    var a = addettiMax(r, ignoti);
+    return a > 0 && r.fatt_ult != null ? r.fatt_ult / a : null;
+  }
 
   function vintageOk(r) {
     if (!state.anno) return true;
@@ -239,34 +259,45 @@
 
     if (!pts.length) { svg.appendChild(txt(L, T + h / 2, 'Nessun dato per questi filtri.', { size: 13 })); return; }
 
-    var lx = function (v) { return Math.log10(v); };
-    var xMin = 0, xMax = lx(Math.max(100, Math.max.apply(null, pts.map(function (p) { return p.n_cf; }))));
-    var yVals = pts.map(function (p) { return lx(p.fatt_per_cf); });
-    var yMin = Math.floor(Math.min.apply(null, yVals)), yMax = Math.ceil(Math.max.apply(null, yVals));
-    if (yMax - yMin < 1) yMax = yMin + 1;
+    var isLog = state.scale === 'log';
+    var lx = isLog ? function (v) { return Math.log10(v); } : function (v) { return v; };
+    var xMin, xMax, yMin, yMax, xTicks = [], yTicks = [];
+
+    if (isLog) {
+      xMin = 0; xMax = lx(Math.max(100, Math.max.apply(null, pts.map(function (p) { return p.n_cf; }))));
+      var yv = pts.map(function (p) { return lx(p.fatt_per_cf); });
+      yMin = Math.floor(Math.min.apply(null, yv)); yMax = Math.ceil(Math.max.apply(null, yv));
+      if (yMax - yMin < 1) yMax = yMin + 1;
+      for (var e = yMin; e <= yMax; e++) yTicks.push(Math.pow(10, e));
+      [1, 2, 3, 5, 10, 20, 50, 100].forEach(function (v) { if (lx(v) <= xMax) xTicks.push(v); });
+    } else {
+      var scX = niceScale(Math.max.apply(null, pts.map(function (p) { return p.n_cf; })), 5, true);
+      var scY = niceScale(Math.max.apply(null, pts.map(function (p) { return p.fatt_per_cf; })), 5);
+      xMin = 0; xMax = scX.max; yMin = 0; yMax = scY.max;
+      xTicks = scX.ticks; yTicks = scY.ticks;
+    }
 
     var X = function (v) { return L + (lx(v) - xMin) / (xMax - xMin) * w; };
     var Y = function (v) { return T + h - (lx(v) - yMin) / (yMax - yMin) * h; };
 
-    // griglia + assi
-    for (var e = yMin; e <= yMax; e++) {
-      var yy = Y(Math.pow(10, e));
+    yTicks.forEach(function (v) {
+      var yy = Y(v);
       svg.appendChild(gridline(L, yy, L + w, yy));
-      svg.appendChild(txt(L - 10, yy, eurShort(Math.pow(10, e)), { anchor: 'end', baseline: 'middle', tabular: true }));
-    }
-    [1, 2, 3, 5, 10, 20, 50, 100].forEach(function (v) {
-      if (lx(v) > xMax) return;
+      svg.appendChild(txt(L - 10, yy, eurShort(v), { anchor: 'end', baseline: 'middle', tabular: true }));
+    });
+    xTicks.forEach(function (v) {
+      if (!isLog && v === 0) return;
       var xx = X(v);
       svg.appendChild(gridline(xx, T, xx, T + h));
       svg.appendChild(txt(xx, T + h + 18, String(v), { anchor: 'middle', tabular: true }));
     });
     svg.appendChild(axisline(L, T + h, L + w, T + h));
-    svg.appendChild(txt(L + w / 2, T + h + 42, 'numero di consulenti finanziari', { anchor: 'middle', size: 12, fill: 'var(--text-secondary)' }));
-    var yl = txt(0, 0, 'fatturato per consulente', { anchor: 'middle', size: 12, fill: 'var(--text-secondary)' });
+    svg.appendChild(txt(L + w / 2, T + h + 42, 'consulenti iscritti all\'albo per la società', { anchor: 'middle', size: 12, fill: 'var(--text-secondary)' }));
+    var yl = txt(0, 0, 'fatturato per consulente iscritto', { anchor: 'middle', size: 12, fill: 'var(--text-secondary)' });
     yl.setAttribute('transform', 'translate(15,' + (T + h / 2) + ') rotate(-90)');
     svg.appendChild(yl);
 
-    // regressione log-log sui punti visibili
+    // regressione nello spazio visualizzato (log-log oppure lineare)
     if (pts.length > 2) {
       var mx = pts.reduce(function (a, p) { return a + lx(p.n_cf); }, 0) / pts.length;
       var my = pts.reduce(function (a, p) { return a + lx(p.fatt_per_cf); }, 0) / pts.length;
@@ -686,63 +717,64 @@
     var re = b.filter(function (r) { return r.n_cf >= 8; });
     var mb = median(bo.map(function (r) { return r.fatt_per_cf; }));
     var mr = median(re.map(function (r) { return r.fatt_per_cf; }));
-    /* stesso confronto a parita' di anzianita': isola l'effetto "societa' giovane" */
-    var oldB = bo.filter(function (r) { return r.anno_cost && r.anno_cost <= 2021; });
-    var oldR = re.filter(function (r) { return r.anno_cost && r.anno_cost <= 2021; });
-    var mb2 = median(oldB.map(function (r) { return r.fatt_per_cf; }));
-    var mr2 = median(oldR.map(function (r) { return r.fatt_per_cf; }));
 
     var co = document.getElementById('modelCallout');
     co.textContent = '';
     var p = document.createElement('p');
     if (mb && mr) {
-      p.appendChild(document.createTextNode('In mediana le società fino a 3 consulenti fatturano '));
-      var st = document.createElement('strong');
-      st.textContent = nf1.format(mb / mr) + ' volte';
-      p.appendChild(st);
-      p.appendChild(document.createTextNode(' per consulente rispetto a quelle con 8 o più'));
-      if (mb2 && mr2) {
-        p.appendChild(document.createTextNode('; restringendo alle sole società costituite entro il 2021 il rapporto è ' +
-          nf1.format(mb2 / mr2) + ' volte, quindi non è un effetto dell\'età delle società.'));
-      } else { p.appendChild(document.createTextNode('.')); }
-      var p2 = document.createElement('p');
-      p2.style.marginBottom = '0';
-      p2.appendChild(document.createTextNode('Sono mediane, e nascondono una dispersione enorme: '));
-      var srt = re.slice().sort(function (x, y) { return y.fatt_per_cf - x.fatt_per_cf; });
-      if (srt.length > 1) {
-        var s2 = document.createElement('strong');
-        s2.textContent = 'fra le società con 8+ consulenti si va da ' + eur(srt[srt.length - 1].fatt_per_cf) +
-          ' a ' + eur(srt[0].fatt_per_cf);
-        p2.appendChild(s2);
-        p2.appendChild(document.createTextNode('. La classe dimensionale non descrive un modo di lavorare.'));
+      p.appendChild(document.createTextNode('Il fatturato per consulente iscritto va da '));
+      var lo = b.slice().sort(function (x, y) { return x.fatt_per_cf - y.fatt_per_cf; });
+      var s1 = document.createElement('strong');
+      s1.textContent = eur(lo[0].fatt_per_cf) + ' a ' + eur(lo[lo.length - 1].fatt_per_cf);
+      p.appendChild(s1);
+      var reV = re.map(function (r) { return r.fatt_per_cf; });
+      p.appendChild(document.createTextNode(': un fattore ' + nfInt.format(Math.round(lo[lo.length-1].fatt_per_cf / lo[0].fatt_per_cf)) + '.'));
+      if (reV.length > 1) {
+        p.appendChild(document.createTextNode(' Anche fra le sole società con 8 o più consulenti — quelle che dovrebbero somigliarsi di più — si va da ' +
+          eur(Math.min.apply(null, reV)) + ' a ' + eur(Math.max.apply(null, reV)) +
+          '. Consultique e IFA Consulting, entrambe con 8 o più consulenti, sono ai primi due posti del settore: la classe dimensionale non descrive un modo di lavorare.'));
       }
-      co.appendChild(p); co.appendChild(p2);
+      co.appendChild(p);
     } else {
       p.textContent = 'Con questi filtri non ci sono abbastanza società per il confronto.';
       co.appendChild(p);
     }
+    renderSensitivity(b);
+  }
 
-    var host = document.getElementById('modelCards');
-    host.textContent = '';
-    [
-      { t: 'Fino a 3 consulenti', c: MODEL_COLOR.Boutique, v: mb, n: bo.length, v2: mb2, n2: oldB.length },
-      { t: '8 consulenti o più', c: MODEL_COLOR.Rete, v: mr, n: re.length, v2: mr2, n2: oldR.length }
-    ].forEach(function (m) {
-      var d = document.createElement('div'); d.className = 'model';
-      var hd = document.createElement('div'); hd.className = 'h';
-      var sw = document.createElement('span'); sw.className = 'sw';
-      sw.style.cssText = 'width:11px;height:11px;border-radius:3px;flex:none;background:' + m.c;
-      var tt = document.createElement('span'); tt.textContent = m.t;
-      hd.appendChild(sw); hd.appendChild(tt);
-      var bg = document.createElement('div'); bg.className = 'big';
-      bg.textContent = m.v == null ? '—' : eur(m.v);
-      var sm = document.createElement('div'); sm.className = 'small';
-      sm.textContent = 'mediano per consulente · ' + m.n + ' società con bilancio';
-      var ds = document.createElement('p');
-      ds.textContent = m.v2 == null ? 'Base troppo piccola per il confronto a parità di anzianità.'
-        : 'Solo quelle costituite entro il 2021: ' + eur(m.v2) + ' (' + m.n2 + ' società).';
-      d.appendChild(hd); d.appendChild(bg); d.appendChild(sm); d.appendChild(ds);
-      host.appendChild(d);
+  /* Quanto cambia il confronto per classe secondo l'ipotesi sui dipendenti.
+     Serve a mostrare che l'incertezza sul denominatore supera l'effetto. */
+  function renderSensitivity(b) {
+    var body = document.getElementById('sensBody');
+    if (!body) return;
+    body.textContent = '';
+    var bo = b.filter(function (r) { return r.n_cf <= 3; });
+    var re = b.filter(function (r) { return r.n_cf >= 8; });
+
+    var scen = [
+      { lab: 'Nessuno: solo i consulenti iscritti', f: function (r) { return r.fatt_per_cf; } },
+      { lab: 'Massimo della fascia; fascia ignota = 0', f: function (r) { return perAddettoMin(r, 0); } },
+      { lab: 'Massimo della fascia; fascia ignota = 9', f: function (r) { return perAddettoMin(r, 9); } }
+    ];
+    scen.forEach(function (s, i) {
+      var a = median(bo.map(s.f).filter(function (x) { return x != null; }));
+      var c = median(re.map(s.f).filter(function (x) { return x != null; }));
+      var tr = document.createElement('tr');
+      function td(t, cls) {
+        var e = document.createElement('td');
+        if (cls) e.className = cls;
+        e.textContent = t; tr.appendChild(e); return e;
+      }
+      td(s.lab);
+      td(a == null ? '—' : eur(a), 'num');
+      td(c == null ? '—' : eur(c), 'num');
+      var rt = td(a && c ? nf1.format(a / c) + 'x' : '—', 'num');
+      if (a && c) {
+        rt.style.fontWeight = '680';
+        rt.classList.add(a / c >= 1 ? 'pos' : 'neg');
+      }
+      if (i === 0) tr.style.color = 'var(--muted)';
+      body.appendChild(tr);
     });
   }
 
@@ -880,6 +912,20 @@
       document.getElementById('fAnno').value = ''; document.getElementById('fBil').checked = false;
       renderAll();
     });
+    // scala del grafico a dispersione: opzione di vista, non filtro sui dati
+    Array.prototype.forEach.call(document.querySelectorAll('.seg button[data-scale]'), function (btn) {
+      btn.addEventListener('click', function () {
+        state.scale = btn.getAttribute('data-scale');
+        Array.prototype.forEach.call(document.querySelectorAll('.seg button[data-scale]'), function (b) {
+          b.classList.toggle('on', b === btn);
+        });
+        document.getElementById('subScatter').textContent = state.scale === 'log'
+          ? 'Assi logaritmici: comprime le distanze e rende leggibili tutte le società. Passa il puntatore su un punto per il dettaglio.'
+          : 'Assi lineari: meno leggibile in basso, ma mostra quanto sono distanti davvero gli estremi.';
+        renderScatter(filtered());
+      });
+    });
+
     var qi = document.getElementById('q');
     qi.addEventListener('input', function () { state.q = this.value; renderTable(filtered()); });
     document.getElementById('csvBtn').addEventListener('click', downloadCsv);

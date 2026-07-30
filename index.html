@@ -131,6 +131,16 @@ select:focus-visible,input:focus-visible,.tbtn:focus-visible,th[role=button]:foc
   outline:2px solid var(--series-1);outline-offset:2px
 }
 .chk{display:flex;align-items:center;gap:7px;font-size:.87rem;color:var(--text-secondary);cursor:pointer}
+/* controllo segmentato: opzione di visualizzazione, non un filtro sui dati */
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;flex:none}
+.seg button{
+  font:inherit;font-size:.8rem;padding:6px 12px;border:none;cursor:pointer;
+  background:var(--surface-1);color:var(--text-secondary);
+}
+.seg button + button{border-left:1px solid var(--border)}
+.seg button:hover{color:var(--text-primary)}
+.seg button.on{background:var(--series-1);color:#fff;font-weight:620}
+.seg button:focus-visible{outline:2px solid var(--series-1);outline-offset:-2px}
 .fcount{margin-left:auto;font-size:.83rem;color:var(--muted)}
 .reset{background:none;border:none;color:var(--series-1);font:inherit;font-size:.83rem;cursor:pointer;padding:4px 2px;text-decoration:underline}
 
@@ -226,8 +236,9 @@ footer a{color:var(--text-secondary)}
     <div class="herofig">
       <div class="val" id="heroVal">—</div>
       <div class="lab">
-        è il <strong>fatturato mediano per consulente finanziario</strong>: metà delle SCF con
-        bilancio disponibile sta sotto questa soglia. La forbice va da 360 € a 2,86 milioni.
+        è il <strong>fatturato mediano per consulente iscritto all'albo</strong>: metà delle SCF con
+        bilancio disponibile sta sotto questa soglia. Non è produttività per persona — i dipendenti
+        non sono contati, perché il loro numero esatto non è pubblico.
       </div>
     </div>
 
@@ -276,16 +287,25 @@ footer a{color:var(--text-secondary)}
       <div class="eyebrow">Il risultato principale</div>
       <h2>Il numero di consulenti spiega poco</h2>
       <p>
-        Ogni punto è una SCF: in orizzontale quanti consulenti ha iscritti, in verticale quanto
-        fattura la società per ciascuno di loro. La nuvola è larga due ordini di grandezza e la
-        pendenza è debole: <strong>il numero di consulenti spiega meno di un quarto</strong> della
-        variabilità del fatturato (R² 0,23).
+        Ogni punto è una SCF: in orizzontale quanti consulenti ha iscritti all'albo, in verticale
+        quanto fattura la società per ciascuno di loro. La nuvola copre quasi quattro ordini di grandezza e
+        la pendenza è debole: <strong>il numero di consulenti spiega meno di un quarto</strong>
+        della variabilità del fatturato (R² 0,23). E come si vede più sotto, il conto per persona
+        non si può nemmeno chiudere, perché i dipendenti non sono noti.
       </p>
     </div>
 
     <div class="card">
-      <h3>Consulenti e fatturato per consulente</h3>
-      <div class="sub">Entrambi gli assi sono logaritmici. Passa il puntatore su un punto per il dettaglio.</div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;justify-content:space-between">
+        <div>
+          <h3>Consulenti iscritti e fatturato per consulente</h3>
+          <div class="sub" id="subScatter">Passa il puntatore su un punto per il dettaglio.</div>
+        </div>
+        <div class="seg" role="group" aria-label="Scala degli assi">
+          <button type="button" data-scale="log" class="on">Logaritmica</button>
+          <button type="button" data-scale="lin">Lineare</button>
+        </div>
+      </div>
       <div class="legend" id="legScatter"></div>
       <div class="chartbox"><svg class="chart" id="scatter" role="img"
         aria-label="Grafico a dispersione: numero di consulenti contro fatturato per consulente, per ciascuna SCF"></svg></div>
@@ -313,9 +333,7 @@ footer a{color:var(--text-secondary)}
 
     <div class="callout" id="modelCallout"></div>
 
-    <div class="two" id="modelCards"></div>
-
-    <h3 style="margin-top:30px">Chi fattura a chi</h3>
+    <h3 style="margin-top:34px">Chi fattura a chi</h3>
     <p style="max-width:74ch;margin-top:10px;color:var(--text-secondary)">
       Il contratto di consulenza è fra il cliente e la società: <strong>è la SCF a fatturare
       all'investitore l'intera parcella</strong>. Il singolo consulente non fattura al cliente —
@@ -326,27 +344,69 @@ footer a{color:var(--text-secondary)}
       avere una clientela personale fatturata direttamente.
     </p>
     <p style="max-width:74ch;color:var(--text-secondary)">
-      Il divario fra le classi è dunque <strong>reale, non un artefatto contabile</strong>. E non
-      dipende dall'età delle società: restringendo alle sole costituite entro il 2021 il rapporto
-      resta 2,4 volte, e fra queste la mediana è <strong>piatta da 1 a 5 consulenti</strong>
-      (138.216 €) per poi scendere a 75.454 € sopra i 5. Non è una discesa lungo tutta la scala:
-      è uno scalino.
+      Questo chiude una possibile obiezione: le differenze fra società <strong>non sono un
+      artefatto contabile</strong>, perché non c'è fatturato che passa altrove. E non sono un
+      effetto dell'età: restringendo alle sole società costituite entro il 2021 il rapporto fra
+      le classi resta simile, e fra queste la mediana è <strong>piatta da 1 a 5 consulenti</strong>
+      (138.216 €) per poi scendere sopra i 5. Ma resta aperta un'obiezione più seria, che riguarda
+      il denominatore.
     </p>
+
+    <h3 style="margin-top:34px">I consulenti iscritti non sono tutta la forza lavoro</h3>
+    <p style="max-width:74ch;margin-top:10px;color:var(--text-secondary)">
+      In una SCF lavorano anche dei dipendenti, e il loro lavoro concorre a produrre lo stesso
+      fatturato. Una società con un consulente e sei dipendenti ha sette persone al lavoro, non
+      una. Dividere il fatturato per il solo numero di iscritti all'albo sovrastima la produzione
+      per testa, e la sovrastima <em>di più</em> dove i dipendenti sono tanti.
+    </p>
+    <p style="max-width:74ch;color:var(--text-secondary)">
+      Il problema è che <strong>il numero esatto di dipendenti non è pubblico</strong>. Il registro
+      imprese lo espone a fasce — «0-9», «10-24» — e per 45 società su 109 non lo espone affatto.
+      Con una fascia «0-9» su una società con un consulente, le persone al lavoro sono fra 1 e 10:
+      il fatturato per testa varia di dieci volte. Ecco cosa succede alla mediana del confronto
+      per classe sotto ipotesi diverse:
+    </p>
+
+    <div class="card">
+      <h3>Fatturato per addetto secondo l'ipotesi sui dipendenti</h3>
+      <div class="sub">Mediane. «Addetti» = consulenti iscritti più dipendenti.</div>
+      <div class="tablewrap"><table id="sensTbl" style="min-width:620px">
+        <caption class="vh">Confronto della mediana del fatturato per addetto sotto ipotesi diverse sul numero di dipendenti</caption>
+        <thead><tr>
+          <th>Ipotesi sui dipendenti</th>
+          <th class="num">Fino a 3 CF</th>
+          <th class="num">8+ CF</th>
+          <th class="num">Rapporto</th>
+        </tr></thead>
+        <tbody id="sensBody"></tbody>
+      </table></div>
+    </div>
+
+    <div class="callout" style="border-left-color:var(--critical)">
+      <p style="margin-bottom:8px">
+        <strong>Il segno si inverte.</strong> A seconda di quanti dipendenti si ipotizzano, la
+        mediana delle società piccole passa dall'essere 2,7 volte quella delle grandi a essere
+        meno della metà. L'incertezza sul denominatore è più ampia dell'effetto che si vorrebbe
+        misurare, quindi <strong>da questi dati non si può dire quale classe dimensionale sia più
+        produttiva per persona</strong>.
+      </p>
+      <p style="margin-bottom:0">
+        Resta valido tutto ciò che non richiede un denominatore: fatturati, utili, margini,
+        crescita, concentrazione e classifiche assolute. E resta valido il fatto descrittivo che
+        il fatturato per consulente iscritto vari di quasi quattro ordini di grandezza — purché si legga
+        per quello che è: <em>ricavo per iscritto all'albo</em>, non produttività per persona.
+      </p>
+    </div>
 
     <div class="callout" style="border-left-color:var(--muted);background:var(--surface-1)">
       <h3 style="margin-bottom:8px">Cosa questi dati <em>non</em> dicono</h3>
-      <p style="margin-bottom:8px">
-        Le fonti usate qui contengono bilanci e iscrizioni all'albo. <strong>Non contengono nulla
-        sui clienti</strong>: né quanti sono, né quanto è grande il patrimonio che affidano, né
-        come è costruita la parcella, né quanti dei consulenti iscritti abbiano un portafoglio
-        avviato.
-      </p>
       <p style="margin-bottom:0">
-        Perciò questa pagina non afferma perché il fatturato per consulente vari così tanto.
-        Un fatturato basso per consulente può voler dire clienti piccoli, parcelle basse, oppure
-        consulenti iscritti che non hanno ancora prodotto — e da questi numeri <strong>le tre
-        ipotesi sono indistinguibili</strong>. Per separarle servirebbero il numero di clienti,
-        le masse in consulenza e i contratti: dati che non sono pubblici.
+        Le fonti usate contengono bilanci e iscrizioni all'albo. Non contengono il numero esatto
+        di dipendenti, né nulla sui clienti: quanti siano, quale patrimonio affidino, come sia
+        costruita la parcella, quanti dei consulenti iscritti abbiano un portafoglio avviato.
+        Perciò questa pagina non afferma <em>perché</em> il fatturato per iscritto vari così tanto:
+        clienti pochi o piccoli, parcelle basse e consulenti che non hanno ancora prodotto sono
+        <strong>indistinguibili</strong> da questi numeri.
       </p>
     </div>
   </section>
