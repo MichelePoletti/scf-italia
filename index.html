@@ -165,7 +165,7 @@ select:focus-visible,input:focus-visible,.tbtn:focus-visible,th[role=button]:foc
 
 /* ---------- table ---------- */
 .tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:13px;background:var(--surface-1)}
-table{border-collapse:collapse;width:100%;font-size:.865rem;min-width:1080px}
+table{border-collapse:collapse;width:100%;font-size:.865rem;min-width:1320px}
 th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--grid);white-space:nowrap}
 th{
   background:var(--surface-1);position:sticky;top:0;z-index:5;font-weight:640;font-size:.79rem;
@@ -231,6 +231,7 @@ footer a{color:var(--text-secondary)}
       <span class="tag">Albo OCF al 26/07/2026</span>
       <span class="tag">Bilanci: ultimo esercizio depositato</span>
       <span class="tag">109 società · 522 rapporti di consulenza</span>
+      <span class="tag">Aggiornato 27/07/2026</span>
     </div>
 
     <div class="herofig">
@@ -368,7 +369,27 @@ footer a{color:var(--text-secondary)}
     </p>
 
     <div class="card">
-      <h3>Fatturato per addetto secondo l'ipotesi sui dipendenti</h3>
+      <h3>Dove i dipendenti li conosciamo davvero</h3>
+      <div class="sub">
+        Per nove società ho recuperato il numero <strong>esatto</strong> di dipendenti da
+        ufficiocamerale.it. Ogni riga confronta il ricavo per consulente iscritto (pallino chiaro)
+        con quello per persona effettivamente al lavoro, iscritti più dipendenti (pallino scuro).
+      </div>
+      <div class="legend">
+        <span class="it"><span class="sw" style="border-radius:50%;background:var(--seq-250)"></span>per consulente iscritto</span>
+        <span class="it"><span class="sw" style="border-radius:50%;background:var(--seq-600)"></span>per persona al lavoro</span>
+      </div>
+      <div class="chartbox"><svg class="chart" id="dumbbell" role="img"
+        aria-label="Confronto fra fatturato per consulente iscritto e per persona al lavoro"></svg></div>
+      <p class="small" style="margin:12px 0 0">
+        Tack passa da 2,86 M a 409 K per testa: ha un solo consulente iscritto ma sei dipendenti.
+        Consultique, con 18 iscritti e 24 dipendenti, scende da 272 K a 117 K. Sono nove società
+        su 109: troppo poche, e scelte non a caso, per ricalcolare le mediane di settore.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>E per tutte le altre: quanto pesa l'incertezza</h3>
       <div class="sub">Mediane. «Addetti» = consulenti iscritti più dipendenti.</div>
       <div class="tablewrap"><table id="sensTbl" style="min-width:620px">
         <caption class="vh">Confronto della mediana del fatturato per addetto sotto ipotesi diverse sul numero di dipendenti</caption>
@@ -509,8 +530,15 @@ footer a{color:var(--text-secondary)}
       <p><strong>Albo.</strong> Elenchi ufficiali OCF (Organismo di vigilanza e tenuta dell'albo unico
       dei Consulenti Finanziari), aggiornati al 26 luglio 2026: elenco delle società di consulenza
       finanziaria e elenco dei consulenti finanziari autonomi.</p>
-      <p><strong>Bilanci.</strong> Registro imprese, ultimo esercizio depositato disponibile: 69 società
-      con bilancio 2024, 14 con bilancio 2025, una con bilancio 2023.</p>
+      <p><strong>Bilanci.</strong> Registro imprese, ultimo esercizio depositato disponibile:
+      69 società con bilancio 2024, 15 con bilancio 2025, una con bilancio 2023.</p>
+      <p><strong>Dipendenti.</strong> Il registro imprese li espone a fasce. Per nove società ho
+      recuperato il numero esatto da <em>ufficiocamerale.it</em> (rilevazione 2026); per le altre
+      resta la fascia, o nulla.</p>
+      <p><strong>Dati comunicati direttamente.</strong> Un valore non proviene da fonte pubblica ed
+      è marcato in tabella con «◆ dato comunicato»: il fatturato 2025 di Bert Consulting SCF
+      (829.092 €), fornito da Michele Poletti. Per questa società nessuna delle cinque fonti
+      camerali gratuite consultate espone dati di bilancio.</p>
     </details>
 
     <details>

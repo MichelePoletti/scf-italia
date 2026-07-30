@@ -740,6 +740,61 @@
       co.appendChild(p);
     }
     renderSensitivity(b);
+    renderDumbbell(b);
+  }
+
+  /* Dove i dipendenti sono noti col numero esatto: quanto si sposta il ricavo per
+     testa passando dai soli iscritti all'albo a tutte le persone che lavorano.
+     Forma dumbbell (prima -> dopo per elemento), un'unica tinta in due intensita'. */
+  function renderDumbbell(rows) {
+    var svg = document.getElementById('dumbbell');
+    if (!svg) return;
+    var g = rows.filter(function (r) {
+      return r.dipendenti_esatti != null && r.fatt_per_cf && r.fatt_per_addetto;
+    }).sort(function (a, b) { return b.fatt_per_cf - a.fatt_per_cf; });
+
+    var rowH = 40, L = 210, R = 118, T = 34, B = 44;
+    var H = T + B + g.length * rowH;
+    frame(svg, 900, Math.max(160, H), 620);
+    if (!g.length) { svg.appendChild(txt(L, T + 20, 'Nessuna società con dipendenti noti in questa selezione.', { size: 13 })); return; }
+    var w = 900 - L - R;
+    var sc = niceScale(Math.max.apply(null, g.map(function (r) { return r.fatt_per_cf; })), 5);
+    var X = function (v) { return L + v / sc.max * w; };
+
+    sc.ticks.forEach(function (v) {
+      svg.appendChild(gridline(X(v), T - 8, X(v), T + g.length * rowH));
+      svg.appendChild(txt(X(v), T - 14, eurShort(v), { anchor: 'middle' }));
+    });
+
+    g.forEach(function (r, i) {
+      var y = T + i * rowH + rowH / 2;
+      var x1 = X(r.fatt_per_addetto), x2 = X(r.fatt_per_cf);
+      svg.appendChild(txt(L - 12, y, shortName(r.denominazione).slice(0, 26),
+        { anchor: 'end', baseline: 'middle', size: 11.5, fill: 'var(--text-secondary)' }));
+      var lab = r.n_cf + (r.n_cf === 1 ? ' iscritto' : ' iscritti') + ' · ' +
+                r.dipendenti_esatti + (r.dipendenti_esatti === 1 ? ' dipendente' : ' dipendenti');
+      svg.appendChild(txt(L - 12, y + 13, lab, { anchor: 'end', baseline: 'middle', size: 10 }));
+      var ln = el('line', { x1: x1, y1: y, x2: x2, y2: y });
+      ln.style.stroke = 'var(--seq-250)'; ln.style.strokeWidth = '3'; ln.style.strokeLinecap = 'round';
+      svg.appendChild(ln);
+      [[x1, 'var(--seq-600)'], [x2, 'var(--seq-250)']].forEach(function (d) {
+        var c = el('circle', { cx: d[0], cy: y, r: 5.5 });
+        c.style.fill = d[1]; c.style.stroke = 'var(--surface-1)'; c.style.strokeWidth = '2';
+        svg.appendChild(c);
+      });
+      svg.appendChild(txt(Math.max(x1, x2) + 11, y, eurShort(r.fatt_per_addetto),
+        { baseline: 'middle', size: 11, fill: 'var(--text-secondary)', weight: 620, tabular: true }));
+      var ht = el('rect', { x: L, y: T + i * rowH, width: w, height: rowH });
+      ht.style.fill = 'transparent'; ht.style.cursor = 'pointer';
+      hit(ht, r.denominazione, [
+        { value: eur(r.fatt_per_cf), label: 'per consulente iscritto', color: 'var(--seq-250)' },
+        { value: eur(r.fatt_per_addetto), label: 'per persona al lavoro', color: 'var(--seq-600)' },
+        { value: r.n_cf + ' + ' + r.dipendenti_esatti, label: 'iscritti + dipendenti' }
+      ]);
+      svg.appendChild(ht);
+    });
+    svg.appendChild(txt(L + w / 2, T + g.length * rowH + 30, 'fatturato per testa',
+      { anchor: 'middle', size: 12, fill: 'var(--text-secondary)' }));
   }
 
   /* Quanto cambia il confronto per classe secondo l'ipotesi sui dipendenti.
@@ -783,10 +838,13 @@
     { k: 'denominazione', l: 'Società', cls: 'name' },
     { k: 'modello', l: 'Modello' },
     { k: 'provincia', l: 'Pr.' },
-    { k: 'n_cf', l: 'CF', num: true },
+    { k: 'n_cf', l: 'Consulenti', num: true },
+    { k: 'dipendenti_esatti', l: 'Dipend.', num: true },
+    { k: 'addetti_noti', l: 'Addetti', num: true },
     { k: 'anno_ult', l: 'Anno' },
     { k: 'fatt_ult', l: 'Fatturato', num: true, fmt: eur },
-    { k: 'fatt_per_cf', l: 'Per CF', num: true, fmt: eur },
+    { k: 'fatt_per_cf', l: 'Per consul.', num: true, fmt: eur },
+    { k: 'fatt_per_addetto', l: 'Per addetto', num: true, fmt: eur },
     { k: 'utile_ult', l: 'Utile', num: true, fmt: eur, signed: true },
     { k: 'margine_pct', l: 'Margine', num: true, fmt: function (v) { return v == null ? '—' : nf1.format(v) + '%'; } },
     { k: 'cresc_24_pct', l: 'Cresc. 24', num: true, fmt: pct, signed: true },
@@ -848,6 +906,14 @@
         } else {
           td.textContent = v == null ? '—' : (c.fmt ? c.fmt(v) : String(v));
           if (c.signed && typeof v === 'number') td.classList.add(v < 0 ? 'neg' : 'pos');
+          // il dato non camerale va segnalato: il lettore deve poterlo distinguere
+          if (c.k === 'denominazione' && r.fonte_fatturato) {
+            var bg = document.createElement('span');
+            bg.className = 'pill'; bg.style.marginLeft = '7px'; bg.style.fontSize = '.68rem';
+            bg.textContent = '◆ dato comunicato';
+            bg.title = 'Fatturato fornito direttamente, non presente nelle fonti camerali gratuite';
+            td.appendChild(bg);
+          }
         }
         tr.appendChild(td);
       });
